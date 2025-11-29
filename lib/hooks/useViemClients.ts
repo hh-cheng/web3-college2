@@ -1,13 +1,13 @@
 'use client'
 import { useMemo } from 'react'
-import { sepolia } from 'viem/chains'
 import { http, custom, createPublicClient, createWalletClient } from 'viem'
 
 import { useWalletStore } from '@/stores/useWalletStore'
+import { targetChain, targetRpcUrl } from '../config/chain'
 
 const publicClient = createPublicClient({
-  chain: sepolia,
-  transport: http(process.env.CHAIN_RPC_URL),
+  chain: targetChain,
+  transport: http(targetRpcUrl),
 })
 
 export default function useViemClients() {
@@ -18,7 +18,10 @@ export default function useViemClients() {
 
   const walletClient = useMemo(() => {
     if (!ethereum || !address) return
-    return createWalletClient({ chain: sepolia, transport: custom(ethereum) })
+    return createWalletClient({
+      chain: targetChain,
+      transport: custom(ethereum),
+    })
   }, [ethereum, address])
 
   return { publicClient, walletClient, address }
