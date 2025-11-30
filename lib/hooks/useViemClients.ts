@@ -11,10 +11,8 @@ const publicClient = createPublicClient({
 })
 
 export default function useViemClients() {
-  const { address, ethereum } = useWalletStore((state) => ({
-    address: state.address,
-    ethereum: state.ethereum,
-  }))
+  const address = useWalletStore((s) => s.address)
+  const ethereum = useWalletStore((s) => s.ethereum)
 
   const walletClient = useMemo(() => {
     if (!ethereum || !address) return

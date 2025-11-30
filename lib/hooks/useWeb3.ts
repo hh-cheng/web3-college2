@@ -40,15 +40,12 @@ type UseWeb3Result = {
 }
 
 export default function useWeb3(): UseWeb3Result {
-  const { status, address, chainID, connect, disconnect } = useWalletStore(
-    (s) => ({
-      status: s.status,
-      address: s.address,
-      chainID: s.chainID,
-      connect: s.connect,
-      disconnect: s.disconnect,
-    }),
-  )
+  // Use separate selectors to avoid creating new object references on each render
+  const status = useWalletStore((s) => s.status)
+  const address = useWalletStore((s) => s.address)
+  const chainID = useWalletStore((s) => s.chainID)
+  const connect = useWalletStore((s) => s.connect)
+  const disconnect = useWalletStore((s) => s.disconnect)
   const { publicClient, walletClient } = useViemClients()
 
   const isConnecting = status === 'connecting'
