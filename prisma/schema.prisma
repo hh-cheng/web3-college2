@@ -24,6 +24,8 @@ model Courses {
   chain_id          Int
   title             String
   price             String
+  key               String // 存储在桶中的key
+  cover_key         String // 封面图片的key
   created_at        DateTime @default(now())
   updated_at        DateTime @updatedAt
 }
