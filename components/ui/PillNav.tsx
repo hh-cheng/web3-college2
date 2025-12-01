@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { gsap } from 'gsap'
 
 export type PillNavItem = {
@@ -10,11 +10,12 @@ export type PillNavItem = {
 }
 
 export interface PillNavProps {
-  logo: string
+  logo?: string
   logoAlt?: string
   items: PillNavItem[]
   activeHref?: string
   className?: string
+  wrapperClassName?: string
   ease?: string
   baseColor?: string
   pillColor?: string
@@ -30,6 +31,7 @@ const PillNav: React.FC<PillNavProps> = ({
   items,
   activeHref,
   className = '',
+  wrapperClassName,
   ease = 'power3.easeOut',
   baseColor = '#fff',
   pillColor = '#060010',
@@ -38,6 +40,10 @@ const PillNav: React.FC<PillNavProps> = ({
   onMobileMenuClick,
   initialLoadAnimation = true,
 }) => {
+  const showLogo = logo && items?.[0]?.href
+  const defaultWrapperClass =
+    'absolute top-[1em] z-1000 w-full left-0 md:w-auto md:left-auto'
+  const wrapperClass = wrapperClassName ?? defaultWrapperClass
   const resolvedPillTextColor = pillTextColor ?? baseColor
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const circleRefs = useRef<Array<HTMLSpanElement | null>>([])
@@ -257,62 +263,63 @@ const PillNav: React.FC<PillNavProps> = ({
   } as React.CSSProperties
 
   return (
-    <div className="absolute top-[1em] z-1000 w-full left-0 md:w-auto md:left-auto">
+    <div className={wrapperClass}>
       <nav
         className={`w-full md:w-max flex items-center justify-between md:justify-start box-border px-4 md:px-0 ${className}`}
         aria-label="Primary"
         style={cssVars}
       >
-        {isRouterLink(items?.[0]?.href) ? (
-          <Link
-            to={items[0].href}
-            aria-label="Home"
-            onMouseEnter={handleLogoEnter}
-            role="menuitem"
-            ref={(el) => {
-              logoRef.current = el
-            }}
-            className="rounded-full p-2 inline-flex items-center justify-center overflow-hidden"
-            style={{
-              width: 'var(--nav-h)',
-              height: 'var(--nav-h)',
-              background: 'var(--base, #000)',
-            }}
-          >
-            <img
-              src={logo}
-              alt={logoAlt}
-              ref={logoImgRef}
-              className="w-full h-full object-cover block"
-            />
-          </Link>
-        ) : (
-          <a
-            href={items?.[0]?.href || '#'}
-            aria-label="Home"
-            onMouseEnter={handleLogoEnter}
-            ref={(el) => {
-              logoRef.current = el
-            }}
-            className="rounded-full p-2 inline-flex items-center justify-center overflow-hidden"
-            style={{
-              width: 'var(--nav-h)',
-              height: 'var(--nav-h)',
-              background: 'var(--base, #000)',
-            }}
-          >
-            <img
-              src={logo}
-              alt={logoAlt}
-              ref={logoImgRef}
-              className="w-full h-full object-cover block"
-            />
-          </a>
-        )}
+        {showLogo &&
+          (isRouterLink(items?.[0]?.href) ? (
+            <Link
+              href={items[0].href}
+              aria-label="Home"
+              onMouseEnter={handleLogoEnter}
+              role="menuitem"
+              ref={(el) => {
+                logoRef.current = el
+              }}
+              className="rounded-full p-2 inline-flex items-center justify-center overflow-hidden"
+              style={{
+                width: 'var(--nav-h)',
+                height: 'var(--nav-h)',
+                background: 'var(--base, #000)',
+              }}
+            >
+              <img
+                src={logo}
+                alt={logoAlt}
+                ref={logoImgRef}
+                className="w-full h-full object-cover block"
+              />
+            </Link>
+          ) : (
+            <a
+              href={items?.[0]?.href || '#'}
+              aria-label="Home"
+              onMouseEnter={handleLogoEnter}
+              ref={(el) => {
+                logoRef.current = el
+              }}
+              className="rounded-full p-2 inline-flex items-center justify-center overflow-hidden"
+              style={{
+                width: 'var(--nav-h)',
+                height: 'var(--nav-h)',
+                background: 'var(--base, #000)',
+              }}
+            >
+              <img
+                src={logo}
+                alt={logoAlt}
+                ref={logoImgRef}
+                className="w-full h-full object-cover block"
+              />
+            </a>
+          ))}
 
         <div
           ref={navItemsRef}
-          className="relative items-center rounded-full hidden md:flex ml-2"
+          className={`relative items-center rounded-full hidden md:flex ${showLogo ? 'ml-2' : ''}`}
           style={{
             height: 'var(--nav-h)',
             background: 'var(--base, #000)',
@@ -382,7 +389,7 @@ const PillNav: React.FC<PillNavProps> = ({
                   {isRouterLink(item.href) ? (
                     <Link
                       role="menuitem"
-                      to={item.href}
+                      href={item.href}
                       className={basePillClasses}
                       style={pillStyle}
                       aria-label={item.ariaLabel || item.label}
@@ -463,7 +470,7 @@ const PillNav: React.FC<PillNavProps> = ({
               <li key={item.href}>
                 {isRouterLink(item.href) ? (
                   <Link
-                    to={item.href}
+                    href={item.href}
                     className={linkClasses}
                     style={defaultStyle}
                     onMouseEnter={hoverIn}

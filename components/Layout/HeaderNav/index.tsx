@@ -1,6 +1,7 @@
 'use client'
 import Logo from './components/Logo'
 import Wallet from './components/Wallet'
+import HeaderMenu from './components/HeaderMenu'
 import GlassSurface from '@/components/ui/GlassSurface'
 
 const cssVars = {
@@ -39,7 +40,7 @@ export default function HeaderNav() {
           <Logo />
 
           {/* Navigation Pills */}
-          {/* <HeaderMenu /> */}
+          <HeaderMenu />
 
           {/* Wallet Component (Right Side) */}
           <Wallet />
