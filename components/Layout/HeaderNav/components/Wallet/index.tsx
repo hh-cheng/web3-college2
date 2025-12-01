@@ -1,7 +1,5 @@
 'use client'
-import { toast } from 'sonner'
 import { isNotNil } from 'es-toolkit'
-import { useEffect, useMemo, useState, useTransition } from 'react'
 import {
   Copy,
   LogOut,
@@ -13,7 +11,7 @@ import {
   Network,
 } from 'lucide-react'
 
-import useWeb3 from '@/lib/hooks/useWeb3'
+import useWallet from './service'
 import { truncateAddress } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { targetChain } from '@/lib/config/chain'
@@ -25,80 +23,22 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 
-// TODO 连接钱包时先查数据库，如果已经记录当前地址则获取起昵称
-// TODO 如果未记录当前地址，则新增一条用户数据，昵称默认为地址
-
 export default function Wallet() {
   const {
-    status,
+    hasConnected,
     address,
     chainID,
     connect,
-    disconnect,
-    getBalance,
     isConnecting,
-  } = useWeb3()
-
-  const [copied, setCopied] = useState(false)
-  const [isRefreshing, startRefreshing] = useTransition()
-  const [balance, setBalance] = useState<{ wei: bigint; eth: string } | null>(
-    null,
-  )
-
-  const hasConnected = status === 'connected' && isNotNil(address)
-
-  const formattedBalance = useMemo(() => {
-    if (!balance?.eth) return '0.00'
-    const num = parseFloat(balance.eth)
-    if (num === 0) return '0.00'
-    if (num < 0.0001) return '< 0.0001'
-    return num.toLocaleString('en-US', {
-      maximumFractionDigits: 4,
-      minimumFractionDigits: 2,
-    })
-  }, [balance?.eth])
-
-  const explorerUrl = useMemo(() => {
-    if (!address || !targetChain.blockExplorers?.default) return null
-    return `${targetChain.blockExplorers.default.url}/address/${address}`
-  }, [address])
-
-  const copyAddress = () => {
-    if (!address) return
-    startRefreshing(async () => {
-      try {
-        await navigator.clipboard.writeText(address)
-        setCopied(true)
-        toast.success('Address copied to clipboard')
-        setTimeout(() => setCopied(false), 2000)
-      } catch (err) {
-        toast.error('Failed to copy address')
-      }
-    })
-  }
-
-  const refreshBalance = async () => {
-    if (!address || isRefreshing) return
-    startRefreshing(async () => {
-      try {
-        const balance = await getBalance(address)
-        setBalance(balance)
-        toast.success('Balance refreshed')
-      } catch (err) {
-        toast.error('Failed to refresh balance')
-      }
-    })
-  }
-
-  const handleDisconnect = () => {
-    disconnect()
-    toast.success('Wallet disconnected')
-  }
-
-  useEffect(() => {
-    if (!address) return
-    refreshBalance()
-  }, [address])
+    disconnect,
+    nickname,
+    formattedBalance,
+    isRefreshing,
+    refreshBalance,
+    copyAddress,
+    copied,
+    explorerUrl,
+  } = useWallet()
 
   if (!hasConnected) {
     return (
@@ -122,7 +62,10 @@ export default function Wallet() {
             <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border-2 border-background" />
             <WalletIcon className="w-4 h-4" />
           </div>
-          <span className="font-medium">{truncateAddress(address)}</span>
+          <span className="font-medium">
+            {(isNotNil(nickname) && nickname !== address) ||
+              (address ? truncateAddress(address) : '')}
+          </span>
           <ChevronDown className="w-4 h-4 opacity-50" />
         </Button>
       </DropdownMenuTrigger>
@@ -142,6 +85,11 @@ export default function Wallet() {
               <p className="text-xs text-muted-foreground font-medium mb-1">
                 Connected Wallet
               </p>
+              {isNotNil(nickname) && nickname !== address && (
+                <p className="text-sm font-semibold text-foreground truncate mb-1">
+                  {nickname}
+                </p>
+              )}
               <p className="text-sm font-semibold text-foreground truncate font-mono">
                 {address}
               </p>
@@ -215,7 +163,7 @@ export default function Wallet() {
           <DropdownMenuSeparator />
 
           <DropdownMenuItem
-            onClick={handleDisconnect}
+            onClick={disconnect}
             className="cursor-pointer text-destructive focus:text-destructive"
             variant="destructive"
           >
