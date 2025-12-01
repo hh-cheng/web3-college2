@@ -25,6 +25,9 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 
+// TODO 连接钱包时先查数据库，如果已经记录当前地址则获取起昵称
+// TODO 如果未记录当前地址，则新增一条用户数据，昵称默认为地址
+
 export default function Wallet() {
   const {
     status,
