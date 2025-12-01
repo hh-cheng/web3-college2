@@ -1,7 +1,7 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
-import Link from 'next/link'
 import { gsap } from 'gsap'
+import Link from 'next/link'
+import { useEffect, useRef, useState } from 'react'
 
 export type PillNavItem = {
   label: string
@@ -331,7 +331,7 @@ const PillNav: React.FC<PillNavProps> = ({
             style={{ gap: 'var(--pill-gap)' }}
           >
             {items.map((item, i) => {
-              const isActive = activeHref === item.href
+              const isActive = activeHref?.startsWith(item.href)
 
               const pillStyle: React.CSSProperties = {
                 background: 'var(--pill-bg, #fff)',
