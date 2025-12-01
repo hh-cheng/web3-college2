@@ -54,9 +54,9 @@ export const JsonNull = runtime.JsonNull
 export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
-  User: 'User',
-  Course: 'Course',
-  Purchase: 'Purchase',
+  Users: 'Users',
+  Courses: 'Courses',
+  Purchases: 'Purchases',
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -75,7 +75,7 @@ export const TransactionIsolationLevel = {
 export type TransactionIsolationLevel =
   (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
-export const UserScalarFieldEnum = {
+export const UsersScalarFieldEnum = {
   id: 'id',
   wallet_address: 'wallet_address',
   nickname: 'nickname',
@@ -84,23 +84,26 @@ export const UserScalarFieldEnum = {
   updated_at: 'updated_at',
 } as const
 
-export type UserScalarFieldEnum =
-  (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+export type UsersScalarFieldEnum =
+  (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum]
 
-export const CourseScalarFieldEnum = {
+export const CoursesScalarFieldEnum = {
   id: 'id',
   course_onchain_id: 'course_onchain_id',
   creator_address: 'creator_address',
+  chain_id: 'chain_id',
   title: 'title',
   price: 'price',
+  key: 'key',
+  cover_key: 'cover_key',
   created_at: 'created_at',
   updated_at: 'updated_at',
 } as const
 
-export type CourseScalarFieldEnum =
-  (typeof CourseScalarFieldEnum)[keyof typeof CourseScalarFieldEnum]
+export type CoursesScalarFieldEnum =
+  (typeof CoursesScalarFieldEnum)[keyof typeof CoursesScalarFieldEnum]
 
-export const PurchaseScalarFieldEnum = {
+export const PurchasesScalarFieldEnum = {
   id: 'id',
   course_onchain_id: 'course_onchain_id',
   buyer_address: 'buyer_address',
@@ -111,8 +114,8 @@ export const PurchaseScalarFieldEnum = {
   updated_at: 'updated_at',
 } as const
 
-export type PurchaseScalarFieldEnum =
-  (typeof PurchaseScalarFieldEnum)[keyof typeof PurchaseScalarFieldEnum]
+export type PurchasesScalarFieldEnum =
+  (typeof PurchasesScalarFieldEnum)[keyof typeof PurchasesScalarFieldEnum]
 
 export const SortOrder = {
   asc: 'asc',

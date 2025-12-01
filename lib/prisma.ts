@@ -1,4 +1,5 @@
 'use server'
+import { Pool } from 'pg'
 import { PrismaPg } from '@prisma/adapter-pg'
 
 import { buildPgUrl } from './secret'
@@ -17,8 +18,19 @@ async function getPrismaClient(): Promise<PrismaClient> {
   // Build database URL with credentials from AWS Secrets Manager
   const databaseUrl = await buildPgUrl()
 
-  // Create adapter with connection string
-  const adapter = new PrismaPg({ connectionString: databaseUrl })
+  // Create Pool with explicit SSL config for AWS RDS
+  // Must accept self-signed certificates from RDS
+  const pool = new Pool({
+    connectionString: databaseUrl,
+    ssl: {
+      rejectUnauthorized: false,
+      // Explicitly disable certificate checking
+      checkServerIdentity: () => undefined,
+    },
+  })
+
+  // Create adapter with the configured pool
+  const adapter = new PrismaPg(pool)
 
   // Create Prisma client with adapter (required for Rust-free engine)
   const client = new PrismaClient({ adapter })

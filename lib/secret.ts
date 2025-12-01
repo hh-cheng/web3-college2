@@ -70,7 +70,7 @@ export async function buildPgUrl(): Promise<string> {
   const encodedPassword = encodeURIComponent(password)
   const encodedDbName = encodeURIComponent(dbName)
 
-  const params = process.env.DB_CONN_PARAMS || ''
+  const params = process.env.DB_CONN_PARAMS || 'sslmode=require'
   const queryString = params ? `?${params}` : ''
 
   return `postgresql://${encodedUsername}:${encodedPassword}@${host}:${port}/${encodedDbName}${queryString}`

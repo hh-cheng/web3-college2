@@ -7,7 +7,7 @@
  *
  * 🟢 You can import this file directly.
  */
-export type * from './models/User'
-export type * from './models/Course'
-export type * from './models/Purchase'
+export type * from './models/Users'
+export type * from './models/Courses'
+export type * from './models/Purchases'
 export type * from './commonInputTypes'

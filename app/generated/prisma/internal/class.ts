@@ -19,7 +19,7 @@ const config: runtime.GetPrismaClientConfig = {
   engineVersion: 'f09f2815f091dbba658cdcd2264306d88bb5bda6',
   activeProvider: 'postgresql',
   inlineSchema:
-    'generator client {\n  provider   = "prisma-client"\n  output     = "../app/generated/prisma"\n  engineType = "client" // enable Prisma ORM without Rust\n}\n\ndatasource db {\n  provider = "postgresql"\n}\n\nmodel User {\n  id             Int      @id @default(autoincrement())\n  wallet_address String   @unique\n  nickname       String?\n  avatar         String?\n  created_at     DateTime @default(now())\n  updated_at     DateTime @updatedAt\n}\n\nmodel Course {\n  id                Int      @id @default(autoincrement())\n  course_onchain_id String   @unique\n  creator_address   String\n  title             String\n  price             String\n  created_at        DateTime @default(now())\n  updated_at        DateTime @updatedAt\n}\n\nmodel Purchase {\n  id                Int      @id @default(autoincrement())\n  course_onchain_id String   @unique\n  buyer_address     String\n  tx_hash           String   @unique\n  chain_id          Int\n  amount            String\n  created_at        DateTime @default(now())\n  updated_at        DateTime @updatedAt\n}\n',
+    'generator client {\n  provider   = "prisma-client"\n  output     = "../app/generated/prisma"\n  engineType = "client" // enable Prisma ORM without Rust\n}\n\ndatasource db {\n  provider = "postgresql"\n}\n\nmodel Users {\n  id             Int      @id @default(autoincrement())\n  wallet_address String   @unique\n  nickname       String?\n  avatar         String?\n  created_at     DateTime @default(now())\n  updated_at     DateTime @updatedAt\n}\n\nmodel Courses {\n  id                Int      @id @default(autoincrement())\n  course_onchain_id String   @unique\n  creator_address   String\n  chain_id          Int\n  title             String\n  price             String\n  key               String // 存储在桶中的key\n  cover_key         String // 封面图片的key\n  created_at        DateTime @default(now())\n  updated_at        DateTime @updatedAt\n}\n\nmodel Purchases {\n  id                Int      @id @default(autoincrement())\n  course_onchain_id String   @unique\n  buyer_address     String\n  tx_hash           String   @unique\n  chain_id          Int\n  amount            String\n  created_at        DateTime @default(now())\n  updated_at        DateTime @updatedAt\n}\n',
   runtimeDataModel: {
     models: {},
     enums: {},
@@ -28,7 +28,7 @@ const config: runtime.GetPrismaClientConfig = {
 }
 
 config.runtimeDataModel = JSON.parse(
-  '{"models":{"User":{"fields":[{"name":"id","kind":"scalar","type":"Int"},{"name":"wallet_address","kind":"scalar","type":"String"},{"name":"nickname","kind":"scalar","type":"String"},{"name":"avatar","kind":"scalar","type":"String"},{"name":"created_at","kind":"scalar","type":"DateTime"},{"name":"updated_at","kind":"scalar","type":"DateTime"}],"dbName":null},"Course":{"fields":[{"name":"id","kind":"scalar","type":"Int"},{"name":"course_onchain_id","kind":"scalar","type":"String"},{"name":"creator_address","kind":"scalar","type":"String"},{"name":"title","kind":"scalar","type":"String"},{"name":"price","kind":"scalar","type":"String"},{"name":"created_at","kind":"scalar","type":"DateTime"},{"name":"updated_at","kind":"scalar","type":"DateTime"}],"dbName":null},"Purchase":{"fields":[{"name":"id","kind":"scalar","type":"Int"},{"name":"course_onchain_id","kind":"scalar","type":"String"},{"name":"buyer_address","kind":"scalar","type":"String"},{"name":"tx_hash","kind":"scalar","type":"String"},{"name":"chain_id","kind":"scalar","type":"Int"},{"name":"amount","kind":"scalar","type":"String"},{"name":"created_at","kind":"scalar","type":"DateTime"},{"name":"updated_at","kind":"scalar","type":"DateTime"}],"dbName":null}},"enums":{},"types":{}}',
+  '{"models":{"Users":{"fields":[{"name":"id","kind":"scalar","type":"Int"},{"name":"wallet_address","kind":"scalar","type":"String"},{"name":"nickname","kind":"scalar","type":"String"},{"name":"avatar","kind":"scalar","type":"String"},{"name":"created_at","kind":"scalar","type":"DateTime"},{"name":"updated_at","kind":"scalar","type":"DateTime"}],"dbName":null},"Courses":{"fields":[{"name":"id","kind":"scalar","type":"Int"},{"name":"course_onchain_id","kind":"scalar","type":"String"},{"name":"creator_address","kind":"scalar","type":"String"},{"name":"chain_id","kind":"scalar","type":"Int"},{"name":"title","kind":"scalar","type":"String"},{"name":"price","kind":"scalar","type":"String"},{"name":"key","kind":"scalar","type":"String"},{"name":"cover_key","kind":"scalar","type":"String"},{"name":"created_at","kind":"scalar","type":"DateTime"},{"name":"updated_at","kind":"scalar","type":"DateTime"}],"dbName":null},"Purchases":{"fields":[{"name":"id","kind":"scalar","type":"Int"},{"name":"course_onchain_id","kind":"scalar","type":"String"},{"name":"buyer_address","kind":"scalar","type":"String"},{"name":"tx_hash","kind":"scalar","type":"String"},{"name":"chain_id","kind":"scalar","type":"Int"},{"name":"amount","kind":"scalar","type":"String"},{"name":"created_at","kind":"scalar","type":"DateTime"},{"name":"updated_at","kind":"scalar","type":"DateTime"}],"dbName":null}},"enums":{},"types":{}}',
 )
 
 async function decodeBase64AsWasm(
@@ -67,7 +67,7 @@ export interface PrismaClientConstructor {
    * ```
    * const prisma = new PrismaClient()
    * // Fetch zero or more Users
-   * const users = await prisma.user.findMany()
+   * const users = await prisma.users.findMany()
    * ```
    *
    * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
@@ -96,7 +96,7 @@ export interface PrismaClientConstructor {
  * ```
  * const prisma = new PrismaClient()
  * // Fetch zero or more Users
- * const users = await prisma.user.findMany()
+ * const users = await prisma.users.findMany()
  * ```
  *
  * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
@@ -227,34 +227,34 @@ export interface PrismaClient<
   >
 
   /**
-   * `prisma.user`: Exposes CRUD operations for the **User** model.
+   * `prisma.users`: Exposes CRUD operations for the **Users** model.
    * Example usage:
    * ```ts
    * // Fetch zero or more Users
-   * const users = await prisma.user.findMany()
+   * const users = await prisma.users.findMany()
    * ```
    */
-  get user(): Prisma.UserDelegate<ExtArgs, { omit: OmitOpts }>
+  get users(): Prisma.UsersDelegate<ExtArgs, { omit: OmitOpts }>
 
   /**
-   * `prisma.course`: Exposes CRUD operations for the **Course** model.
+   * `prisma.courses`: Exposes CRUD operations for the **Courses** model.
    * Example usage:
    * ```ts
    * // Fetch zero or more Courses
-   * const courses = await prisma.course.findMany()
+   * const courses = await prisma.courses.findMany()
    * ```
    */
-  get course(): Prisma.CourseDelegate<ExtArgs, { omit: OmitOpts }>
+  get courses(): Prisma.CoursesDelegate<ExtArgs, { omit: OmitOpts }>
 
   /**
-   * `prisma.purchase`: Exposes CRUD operations for the **Purchase** model.
+   * `prisma.purchases`: Exposes CRUD operations for the **Purchases** model.
    * Example usage:
    * ```ts
    * // Fetch zero or more Purchases
-   * const purchases = await prisma.purchase.findMany()
+   * const purchases = await prisma.purchases.findMany()
    * ```
    */
-  get purchase(): Prisma.PurchaseDelegate<ExtArgs, { omit: OmitOpts }>
+  get purchases(): Prisma.PurchasesDelegate<ExtArgs, { omit: OmitOpts }>
 }
 
 export function getPrismaClientClass(): PrismaClientConstructor {
