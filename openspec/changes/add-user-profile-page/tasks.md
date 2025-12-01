@@ -1,12 +1,12 @@
 ## 1. Implementation
-- [ ] 1.1 Create server action `app/me/actions.ts` with `updateNickname` function
-- [ ] 1.2 Implement `/me` page component with wallet info display
-- [ ] 1.3 Add nickname display and edit form UI
-- [ ] 1.4 Handle wallet connection state (show connect prompt if disconnected)
-- [ ] 1.5 Integrate balance fetching using `useWeb3` hook
-- [ ] 1.6 Add form validation and error handling
-- [ ] 1.7 Add success/error toast notifications
-- [ ] 1.8 Style page with Tailwind CSS following project conventions
+- [x] 1.1 Create server action `app/me/actions.ts` with `updateNickname` function
+- [x] 1.2 Implement `/me` page component with wallet info display
+- [x] 1.3 Add nickname display and edit form UI
+- [x] 1.4 Handle wallet connection state (show connect prompt if disconnected)
+- [x] 1.5 Integrate balance fetching using `useWeb3` hook
+- [x] 1.6 Add form validation and error handling
+- [x] 1.7 Add success/error toast notifications
+- [x] 1.8 Style page with Tailwind CSS following project conventions
 
 ## 2. Validation
 - [ ] 2.1 Test wallet connection flow on `/me` page

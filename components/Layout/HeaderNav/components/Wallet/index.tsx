@@ -63,8 +63,9 @@ export default function Wallet() {
             <WalletIcon className="w-4 h-4" />
           </div>
           <span className="font-medium">
-            {(isNotNil(nickname) && nickname !== address) ||
-              (address ? truncateAddress(address) : '')}
+            {isNotNil(nickname) && nickname !== address
+              ? nickname
+              : truncateAddress(address || '')}
           </span>
           <ChevronDown className="w-4 h-4 opacity-50" />
         </Button>

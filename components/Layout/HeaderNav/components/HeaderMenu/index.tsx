@@ -12,14 +12,14 @@ export default function HeaderMenu() {
       ariaLabel: 'Navigate to Market page',
     },
     {
-      label: 'Me',
-      href: '/me',
-      ariaLabel: 'Navigate to My Profile page',
-    },
-    {
       label: 'My Courses',
       href: '/my-courses',
       ariaLabel: 'Navigate to My Courses page',
+    },
+    {
+      label: 'Me',
+      href: '/me',
+      ariaLabel: 'Navigate to My Profile page',
     },
   ]
 
