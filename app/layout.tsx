@@ -4,6 +4,7 @@ import localFont from 'next/font/local'
 
 import HeaderNav from '@/components/Layout/HeaderNav'
 import QueryProvider from '@/components/Layout/QueryProvider'
+import WalletInitializer from '@/components/Layout/WalletInitializer'
 
 import './globals.css'
 
@@ -41,6 +42,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${firaCode.variable} antialiased`}>
+        <WalletInitializer />
         <HeaderNav />
         <main className="pt-32 px-8 h-screen overflow-y-auto scrollbar-hide">
           <QueryProvider>{children}</QueryProvider>
