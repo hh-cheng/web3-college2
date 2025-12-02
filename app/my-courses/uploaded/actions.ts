@@ -12,6 +12,7 @@ export type GetUploadedCoursesResult =
         title: string
         price: string
         cover_key: string
+        key: string
         created_at: string
         course_onchain_id: string
       }>
@@ -41,6 +42,7 @@ export async function getUploadedCourses(
             title,
             price,
             cover_key,
+            key,
             created_at,
             course_onchain_id
           FROM "Courses"
@@ -55,6 +57,7 @@ export async function getUploadedCourses(
               title: string
               price: string
               cover_key: string
+              key: string
               created_at: Date
               course_onchain_id: string
             }>
@@ -68,6 +71,7 @@ export async function getUploadedCourses(
             title: course.title,
             price: course.price,
             cover_key: course.cover_key,
+            key: course.key,
             created_at: format(course.created_at, 'yyyy-MM-dd HH:mm:ss'),
             course_onchain_id: course.course_onchain_id,
           }

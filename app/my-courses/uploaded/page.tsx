@@ -1,12 +1,14 @@
 'use client'
 
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { Wallet as WalletIcon } from 'lucide-react'
 
 import useUploadedCourses from './service'
 import { Button } from '@/components/ui/button'
 
 export default function UploadedPage() {
+  const router = useRouter()
   const { data, isLoading, error, address, chainID, connect, isConnecting } =
     useUploadedCourses()
 
@@ -153,7 +155,13 @@ export default function UploadedPage() {
                   <span>Created: {course.created_at}</span>
                 </div>
               </div>
-              <Button className="w-full" variant="default">
+              <Button
+                variant="default"
+                className="w-full cursor-pointer"
+                onClick={() => {
+                  router.push(`/my-courses/uploaded/${course.id}`)
+                }}
+              >
                 View Course
               </Button>
             </div>
