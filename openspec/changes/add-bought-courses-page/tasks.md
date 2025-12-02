@@ -1,14 +1,14 @@
 ## 1. Implementation
-- [ ] 1.1 Create server action `getBoughtCourses` in `app/my-courses/bought/actions.ts`
+- [x] 1.1 Create server action `getBoughtCourses` in `app/my-courses/bought/actions.ts`
   - Query Purchases table filtered by `buyer_address` and `chain_id`
   - Join with Courses table to get course details (title, price, cover_key, etc.)
   - Return formatted course data with purchase information
   - Handle errors and return appropriate response format
-- [ ] 1.2 Create service hook `useBoughtCourses` in `app/my-courses/bought/service.ts`
+- [x] 1.2 Create service hook `useBoughtCourses` in `app/my-courses/bought/service.ts`
   - Use React Query for data fetching
   - Integrate with `useWeb3` hook for wallet address and chain ID
   - Return data, loading, error states
-- [ ] 1.3 Implement bought courses page component in `app/my-courses/bought/page.tsx`
+- [x] 1.3 Implement bought courses page component in `app/my-courses/bought/page.tsx`
   - Display wallet connection prompt when wallet not connected
   - Show loading state with skeleton cards
   - Display error state with retry option
