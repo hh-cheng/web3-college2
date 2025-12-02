@@ -1,4 +1,3 @@
-'use server'
 import type { Readable } from 'stream'
 import { catchError, firstValueFrom, from, map, mergeMap, of } from 'rxjs'
 import {
@@ -16,7 +15,14 @@ export const r2 = new S3Client({
   },
 })
 
-export async function uploadFile(file: File, type: 'courses' | 'users') {
+export type UploadFileResult =
+  | { success: true; key: string; msg: null }
+  | { success: false; key: null; msg: string }
+
+export async function uploadFile(
+  file: File,
+  type: 'courses' | 'users',
+): Promise<UploadFileResult> {
   return await firstValueFrom(
     from(file.arrayBuffer()).pipe(
       mergeMap((buffer) => {
@@ -28,13 +34,17 @@ export async function uploadFile(file: File, type: 'courses' | 'users') {
           Bucket: process.env.R2_BUCKET!,
         })
 
-        return from(r2.send(command))
+        return from(r2.send(command)).pipe(map(() => ({ key })))
       }),
-      map(() => {
-        return { success: true, msg: null }
+      map(({ key }): UploadFileResult => {
+        return { success: true as const, key, msg: null }
       }),
       catchError((error) => {
-        return of({ success: false, msg: error.message })
+        return of({
+          success: false as const,
+          key: null,
+          msg: error.message,
+        } as UploadFileResult)
       }),
     ),
   )

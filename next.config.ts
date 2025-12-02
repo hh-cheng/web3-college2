@@ -10,6 +10,11 @@ const nextConfig: NextConfig = {
     CHAIN_NATIVE_NAME: process.env.CHAIN_NATIVE_NAME,
     CHAIN_BLOCK_EXPLORER_URL: process.env.CHAIN_BLOCK_EXPLORER_URL,
   },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '1024mb',
+    },
+  },
 }
 
 export default nextConfig

@@ -1,46 +1,46 @@
 ## 1. Implementation
 
 ### 1.1 R2 Upload Function Enhancement
-- [ ] Modify `uploadFile` function in `lib/r2.ts` to return the generated key along with success status
-- [ ] Update return type to include `key: string` when successful
-- [ ] Ensure error handling preserves existing behavior
+- [x] Modify `uploadFile` function in `lib/r2.ts` to return the generated key along with success status
+- [x] Update return type to include `key: string` when successful
+- [x] Ensure error handling preserves existing behavior
 
 ### 1.2 Server Actions
-- [ ] Create `app/my-courses/upload/actions.ts` with `uploadCourse` server action
-- [ ] Implement upload workflow:
-  - [ ] Validate required fields (title, price, cover image, video)
-  - [ ] Upload cover image to R2 and capture key
-  - [ ] Upload video to R2 and capture key
-  - [ ] Get wallet address and chain ID from request context
-  - [ ] Generate unique `course_onchain_id` (format: timestamp-based or UUID)
-  - [ ] Write course record to PostgreSQL via Prisma
-  - [ ] Return success/error result with appropriate messages
+- [x] Create `app/my-courses/upload/actions.ts` with `uploadCourse` server action
+- [x] Implement upload workflow:
+  - [x] Validate required fields (title, price, cover image, video)
+  - [x] Upload cover image to R2 and capture key
+  - [x] Upload video to R2 and capture key
+  - [x] Get wallet address and chain ID from request context
+  - [x] Generate unique `course_onchain_id` (format: timestamp-based or UUID)
+  - [x] Write course record to PostgreSQL via Prisma
+  - [x] Return success/error result with appropriate messages
 
 ### 1.3 Upload Page UI
-- [ ] Create upload form component in `app/my-courses/upload/page.tsx`
-- [ ] Add form fields:
-  - [ ] Course title (text input, required)
-  - [ ] Course price (text/number input, required)
-  - [ ] Cover image (file input, accept images, required)
-  - [ ] Video file (file input, accept video, required)
-- [ ] Add form validation (client-side)
-- [ ] Add submit button with loading state
-- [ ] Integrate with wallet connection (check if connected, show message if not)
-- [ ] Display preview of selected cover image
-- [ ] Show upload progress/loading indicators
+- [x] Create upload form component in `app/my-courses/upload/page.tsx`
+- [x] Add form fields:
+  - [x] Course title (text input, required)
+  - [x] Course price (text/number input, required)
+  - [x] Cover image (file input, accept images, required)
+  - [x] Video file (file input, accept video, required)
+- [x] Add form validation (client-side)
+- [x] Add submit button with loading state
+- [x] Integrate with wallet connection (check if connected, show message if not)
+- [x] Display preview of selected cover image
+- [x] Show upload progress/loading indicators
 
 ### 1.4 Form Submission Handling
-- [ ] Implement form submission handler
-- [ ] Call `uploadCourse` server action with form data
-- [ ] Handle success: show success toast and refresh page
-- [ ] Handle errors: show error toast with message
-- [ ] Reset form after successful upload
+- [x] Implement form submission handler
+- [x] Call `uploadCourse` server action with form data
+- [x] Handle success: show success toast and refresh page
+- [x] Handle errors: show error toast with message
+- [x] Reset form after successful upload
 
 ### 1.5 Error Handling
-- [ ] Handle R2 upload failures gracefully
-- [ ] Handle database write failures gracefully
-- [ ] Provide user-friendly error messages
-- [ ] Ensure partial uploads don't leave orphaned R2 objects (consider cleanup on failure)
+- [x] Handle R2 upload failures gracefully
+- [x] Handle database write failures gracefully
+- [x] Provide user-friendly error messages
+- [x] Ensure partial uploads don't leave orphaned R2 objects (consider cleanup on failure)
 
 ## 2. Validation
 
