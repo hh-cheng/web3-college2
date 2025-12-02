@@ -7,13 +7,20 @@ export default function TabMenu() {
   const router = useRouter()
   const pathname = usePathname()
 
-  const activeTab = pathname === '/my-courses/upload' ? 'upload' : 'bought'
+  const activeTab =
+    pathname === '/my-courses/upload'
+      ? 'upload'
+      : pathname === '/my-courses/uploaded'
+        ? 'uploaded'
+        : 'bought'
 
   const handleTabChange = (value: string) => {
     if (value === 'bought') {
       router.push('/my-courses/bought')
     } else if (value === 'upload') {
       router.push('/my-courses/upload')
+    } else if (value === 'uploaded') {
+      router.push('/my-courses/uploaded')
     }
   }
 
@@ -25,6 +32,9 @@ export default function TabMenu() {
         </TabsTrigger>
         <TabsTrigger value="upload" className="cursor-pointer">
           Upload
+        </TabsTrigger>
+        <TabsTrigger value="uploaded" className="cursor-pointer">
+          Uploaded
         </TabsTrigger>
       </TabsList>
     </Tabs>
