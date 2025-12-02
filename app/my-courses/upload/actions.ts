@@ -15,6 +15,7 @@ export async function uploadCourse(
   video: File,
   creatorAddress: string,
   chainId: number,
+  courseOnchainId: string,
 ): Promise<UploadCourseResult> {
   // Validate required fields
   if (!title || !price || !coverImage || !video || !creatorAddress) {
@@ -61,10 +62,7 @@ export async function uploadCourse(
           } as UploadCourseResult)
         }
 
-        // Generate unique course_onchain_id
-        const courseOnchainId = `course-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
-
-        // Write to database
+        // Write to database with the provided on-chain course ID
         return from(getPrisma()).pipe(
           mergeMap((prisma) => {
             return from(

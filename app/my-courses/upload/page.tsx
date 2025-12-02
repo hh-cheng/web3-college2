@@ -7,10 +7,12 @@ import { Upload, Loader2 } from 'lucide-react'
 import { uploadCourse } from './actions'
 import useWeb3 from '@/lib/hooks/useWeb3'
 import { Button } from '@/components/ui/button'
+import { useCreateCourseOnChain } from './hooks'
 
 export default function UploadPage() {
   const router = useRouter()
   const { address, chainID, isConnected, connect, isConnecting } = useWeb3()
+  const createCourseOnChain = useCreateCourseOnChain()
 
   const [title, setTitle] = useState('')
   const [price, setPrice] = useState('')
@@ -85,6 +87,25 @@ export default function UploadPage() {
     setIsSubmitting(true)
 
     try {
+      // Step 1: Create course on-chain first
+      toast.loading('Creating course on blockchain...')
+      const metadataUri = `ipfs://course-${title.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}`
+
+      const onChainResult = await createCourseOnChain.mutateAsync({
+        price: price.trim(),
+        metadataUri,
+      })
+
+      if (!onChainResult.courseId) {
+        throw new Error('Failed to get course ID from blockchain')
+      }
+
+      toast.dismiss()
+      toast.loading('Uploading files and saving course...')
+
+      // Step 2: Upload files and save to database with the on-chain course ID
+      const courseOnchainId = onChainResult.courseId.toString()
+
       const result = await uploadCourse(
         title.trim(),
         price.trim(),
@@ -92,7 +113,10 @@ export default function UploadPage() {
         video,
         address,
         chainID,
+        courseOnchainId,
       )
+
+      toast.dismiss()
 
       if (result.success) {
         toast.success('Course uploaded successfully!')
@@ -109,9 +133,10 @@ export default function UploadPage() {
       } else {
         toast.error(result.msg || 'Failed to upload course')
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading course:', error)
-      toast.error('An unexpected error occurred')
+      toast.dismiss()
+      toast.error(error.message || 'An unexpected error occurred')
     } finally {
       setIsSubmitting(false)
     }
@@ -180,7 +205,7 @@ export default function UploadPage() {
             className="w-full px-3 py-2 rounded-md border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           />
           <p className="text-xs text-muted-foreground">
-            Enter the price in your token format
+            Enter the price in YD tokens (e.g., 10 for 10 YD tokens)
           </p>
         </div>
 

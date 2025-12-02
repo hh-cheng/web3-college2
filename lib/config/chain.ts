@@ -47,3 +47,14 @@ const customChain = defineChain({
 export const targetChain = hasCustomChainConfig ? customChain : sepolia
 export const targetRpcUrl = targetChain.rpcUrls.default.http[0]
 export const targetChainIdHex = `0x${targetChain.id.toString(16)}`
+
+// Debug logging
+if (typeof window !== 'undefined') {
+  console.log('🔍 Chain Configuration:', {
+    chainId: targetChain.id,
+    chainName: targetChain.name,
+    rpcUrl: targetRpcUrl,
+    envChainId,
+    envRpcUrl,
+  })
+}
