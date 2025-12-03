@@ -10,7 +10,7 @@ const secretName = process.env.DB_SECRET_ID!
 // AWS SDK automatically uses credential chain (env vars, IAM role, etc.)
 // No need to manually configure credentials - AWS SDK handles this
 const client = new SecretsManagerClient({
-  region: process.env.AWS_REGION || 'us-east-2',
+  region: process.env.WEB3_AWS_REGION || 'us-east-2',
 })
 
 type AwsDbSecret = {
