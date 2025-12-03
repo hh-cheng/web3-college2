@@ -7,9 +7,7 @@ frontend:
         - nvm use 22.14.0
         - curl -fsSL https://get.pnpm.io/install.sh | sh -
         - export PATH="$HOME/.local/share/pnpm:$PATH"
-        - export TZ=Asia/Shanghai
         - echo "STORE_PATH=$(pnpm store path)" >> .env
-        - export NODE_OPTIONS='--max-old-space-size=7000'
     build:
       commands:
         - env | grep -e CHAIN_ID >> .env.production
