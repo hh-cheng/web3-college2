@@ -39,21 +39,35 @@ function decodeKeyIteratively(encodedKey: string): string {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ key: string }> },
+  { params }: { params: Promise<{ key: string[] }> },
 ) {
-  const originalKey = await params.then((p) => p.key)
+  // Catch-all route: key is an array of path segments
+  // Join them back together to reconstruct the full key path
+  const resolvedParams = await params
+  const keyArray = resolvedParams.key
+
+  // Next.js catch-all routes provide key as an array of strings
+  // Join them with '/' to reconstruct the full path
+  // Handle case where array might have been stringified (with commas)
+  let originalKey: string
+  if (Array.isArray(keyArray)) {
+    originalKey = keyArray.join('/')
+  } else {
+    // Fallback: if it's somehow a string, check if it has commas (from toString())
+    const keyStr = String(keyArray)
+    if (keyStr.includes(',') && !keyStr.includes('/')) {
+      // Split by comma and rejoin with slash
+      originalKey = keyStr.split(',').join('/')
+    } else {
+      originalKey = keyStr
+    }
+  }
+
   let decodedKey: string
 
   try {
     // Handle potential multiple levels of encoding from Next.js Image Optimization
     decodedKey = decodeKeyIteratively(originalKey)
-
-    // Log decoding details for debugging
-    if (decodedKey !== originalKey) {
-      console.log(
-        `[course-image] Decoded key: "${originalKey}" -> "${decodedKey}"`,
-      )
-    }
   } catch (error) {
     // If decoding fails completely, use the key as-is
     console.error(
@@ -84,7 +98,7 @@ export async function GET(
 
     if (!result.success || !result.url) {
       console.error(
-        `[course-image] Failed to generate presigned URL. Key: "${decodedKey}", Original: "${originalKey}", Error: ${result.msg}`,
+        `[course-image] Failed to generate presigned URL. Key: "${decodedKey}", Error: ${result.msg}`,
       )
       return NextResponse.json(
         {
@@ -101,7 +115,7 @@ export async function GET(
 
     if (!imageResponse.ok) {
       console.error(
-        `[course-image] Failed to fetch image from R2. Status: ${imageResponse.status}, Key: "${decodedKey}", Original: "${originalKey}"`,
+        `[course-image] Failed to fetch image from R2. Status: ${imageResponse.status}, Key: "${decodedKey}"`,
       )
       return NextResponse.json(
         {

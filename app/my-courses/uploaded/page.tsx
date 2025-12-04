@@ -129,8 +129,9 @@ export default function UploadedPage() {
                   <Image
                     fill
                     alt={course.title}
-                    // className="w-full h-full object-cover"
-                    src={`/api/course-image/${encodeURIComponent(course.cover_key)}`}
+                    className="object-cover"
+                    src={`/api/course-image/${course.cover_key}`}
+                    unoptimized
                     onError={(e) => {
                       // Fallback if image fails to load
                       const target = e.target as HTMLImageElement
