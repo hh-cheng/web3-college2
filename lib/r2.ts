@@ -105,3 +105,36 @@ export async function readFile(key: string) {
     ),
   )
 }
+
+/**
+ * Create a presigned URL for downloading a file from R2
+ * This bypasses AWS Amplify's 10MB response size limit by allowing
+ * direct downloads from R2
+ */
+export async function createPresignedDownloadUrl(
+  key: string,
+  expiresIn: number = 3600, // Default 1 hour
+): Promise<PresignedUrlResult> {
+  try {
+    const command = new GetObjectCommand({
+      Bucket: process.env.R2_BUCKET!,
+      Key: key,
+    })
+
+    const url = await getSignedUrl(r2, command, { expiresIn })
+
+    return {
+      success: true as const,
+      key,
+      url,
+      msg: null,
+    }
+  } catch (error: any) {
+    return {
+      success: false as const,
+      key: null,
+      url: null,
+      msg: error?.message || 'Failed to generate download URL',
+    }
+  }
+}

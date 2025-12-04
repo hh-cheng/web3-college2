@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { GetObjectCommand } from '@aws-sdk/client-s3'
-import { Readable } from 'stream'
 
-import { r2 } from '@/lib/r2'
+import { createPresignedDownloadUrl } from '@/lib/r2'
 
-// Configure runtime for streaming large files
+// Configure runtime
 export const runtime = 'nodejs'
-export const maxDuration = 300 // 5 minutes for large file streaming
+export const maxDuration = 30 // Reduced since we're just generating URLs
 
 export async function GET(
   request: NextRequest,
@@ -21,70 +19,24 @@ export async function GET(
       return NextResponse.json({ error: 'Invalid video key' }, { status: 400 })
     }
 
-    const rangeHeader = request.headers.get('range') || undefined
+    // Generate presigned URL for direct download from R2
+    // This bypasses AWS Amplify's 10MB response size limit
+    const result = await createPresignedDownloadUrl(decodedKey, 3600) // 1 hour expiry
 
-    const command = new GetObjectCommand({
-      Bucket: process.env.R2_BUCKET!,
-      Key: decodedKey,
-      Range: rangeHeader,
-    })
-
-    const response = await r2.send(command)
-
-    if (!response.Body) {
-      return NextResponse.json({ error: 'Video not found' }, { status: 404 })
+    if (!result.success || !result.url) {
+      return NextResponse.json(
+        { error: result.msg || 'Failed to generate video URL' },
+        { status: 500 },
+      )
     }
 
-    // Stream directly from R2 instead of buffering large files into memory
-    // This prevents loading entire video into memory and avoids 413 errors
-    const nodeStream = response.Body as Readable
-
-    // Convert Node.js Readable stream to Web ReadableStream for Next.js
-    // Buffer extends Uint8Array, so it can be passed directly to ReadableStream
-    const bodyStream = new ReadableStream({
-      start(controller) {
-        nodeStream.on('data', (chunk) => {
-          try {
-            // Convert Buffer to Uint8Array if needed (Buffer extends Uint8Array but ReadableStream prefers Uint8Array)
-            const uint8Chunk =
-              chunk instanceof Uint8Array ? chunk : new Uint8Array(chunk)
-            controller.enqueue(uint8Chunk)
-          } catch (error) {
-            controller.error(error)
-            nodeStream.destroy()
-          }
-        })
-        nodeStream.on('end', () => {
-          controller.close()
-        })
-        nodeStream.on('error', (err) => {
-          controller.error(err)
-        })
+    // Redirect to presigned URL - browser downloads directly from R2
+    // This completely bypasses Amplify's response size limitations
+    return NextResponse.redirect(result.url, {
+      status: 307, // Temporary redirect
+      headers: {
+        'Cache-Control': 'public, max-age=3600', // Cache redirect for 1 hour
       },
-      cancel() {
-        nodeStream.destroy()
-      },
-    })
-
-    // Propagate headers for range/streaming support
-    const headers = new Headers({
-      'Content-Type': response.ContentType || 'video/mp4',
-      'Accept-Ranges': 'bytes',
-      'Cache-Control': 'public, max-age=31536000, immutable',
-    })
-
-    // Content-Length from R2 is already the partial length when range is present
-    if (response.ContentLength !== undefined) {
-      headers.set('Content-Length', response.ContentLength.toString())
-    }
-
-    if (response.ContentRange) {
-      headers.set('Content-Range', response.ContentRange)
-    }
-
-    return new NextResponse(bodyStream, {
-      status: rangeHeader ? 206 : 200,
-      headers,
     })
   } catch (error) {
     console.error('Error fetching course video:', error)
