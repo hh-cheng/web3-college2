@@ -106,7 +106,8 @@ export default function LearnPage() {
           <Image
             fill
             alt={course.title}
-            src={`/api/course-image/${encodeURIComponent(course.cover_key)}`}
+            src={`/api/course-image/${course.cover_key}`}
+            unoptimized
             className="object-cover"
             onError={(e) => {
               const target = e.target as HTMLImageElement

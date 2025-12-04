@@ -213,8 +213,9 @@ export default function MarketPage() {
                     <Image
                       fill
                       alt={course.title}
-                      src={`/api/course-image/${encodeURIComponent(course.cover_key)}`}
+                      src={`/api/course-image/${course.cover_key}`}
                       className="object-cover"
+                      unoptimized
                       onError={(e) => {
                         const target = e.target as HTMLImageElement
                         target.style.display = 'none'

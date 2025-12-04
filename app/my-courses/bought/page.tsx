@@ -129,7 +129,8 @@ export default function BoughtPage() {
                   <Image
                     fill
                     alt={course.title}
-                    src={`/api/course-image/${encodeURIComponent(course.cover_key)}`}
+                    src={`/api/course-image/${course.cover_key}`}
+                    unoptimized
                     onError={(e) => {
                       // Fallback if image fails to load
                       const target = e.target as HTMLImageElement
