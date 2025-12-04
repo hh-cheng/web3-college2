@@ -16,10 +16,6 @@ frontend:
         - env | grep -e CHAIN_NATIVE_SYMBOL >> .env.production
         - env | grep -e CHAIN_NATIVE_NAME >> .env.production
 
-        - env | grep -e WEB3_AWS_REGION >> .env.production
-        - env | grep -e WEB3_AWS_ACCESS_KEY_ID >> .env.production
-        - env | grep -e WEB3_AWS_SECRET_ACCESS_KEY >> .env.production
-
         - env | grep -e DATABASE_URL >> .env.production
         - env | grep -e DB_USERNAME >> .env.production
         - env | grep -e DB_SECRET_ID >> .env.production
