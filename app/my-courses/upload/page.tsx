@@ -4,7 +4,7 @@ import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Upload, Loader2 } from 'lucide-react'
 
-import { uploadCourse } from './actions'
+import { createUploadUrls, saveCourse } from './actions'
 import useWeb3 from '@/lib/hooks/useWeb3'
 import { Button } from '@/components/ui/button'
 import { useCreateCourseOnChain } from './hooks'
@@ -101,16 +101,54 @@ export default function UploadPage() {
       }
 
       toast.dismiss()
-      toast.loading('Uploading files and saving course...')
+      toast.loading('Preparing upload links...')
 
       // Step 2: Upload files and save to database with the on-chain course ID
       const courseOnchainId = onChainResult.courseId.toString()
 
-      const result = await uploadCourse(
+      const presigned = await createUploadUrls(
+        coverImage.name,
+        coverImage.type,
+        video.name,
+        video.type,
+      )
+
+      if (!presigned.success || !presigned.data) {
+        throw new Error(presigned.msg || 'Failed to prepare upload')
+      }
+
+      toast.dismiss()
+      toast.loading('Uploading cover image...')
+
+      const uploadFile = async (url: string, file: File) => {
+        const res = await fetch(url, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': file.type,
+          },
+          body: file,
+        })
+
+        if (!res.ok) {
+          throw new Error(`Failed to upload file (${res.status})`)
+        }
+      }
+
+      await uploadFile(presigned.data.cover.url, coverImage)
+
+      toast.dismiss()
+      toast.loading('Uploading video...')
+
+      await uploadFile(presigned.data.video.url, video)
+
+      toast.dismiss()
+      toast.loading('Saving course...')
+
+      const result = await saveCourse(
         title.trim(),
         price.trim(),
-        coverImage,
-        video,
+        presigned.data.cover.key,
+        presigned.data.video.key,
         address,
         chainID,
         courseOnchainId,

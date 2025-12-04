@@ -2,23 +2,88 @@
 import { catchError, firstValueFrom, from, map, mergeMap, of } from 'rxjs'
 
 import { getPrisma } from '@/lib/prisma'
-import { uploadFile } from '@/lib/r2'
+import { createPresignedUploadUrl } from '@/lib/r2'
 
 export type UploadCourseResult =
   | { success: true; data: { courseId: number }; msg: null }
   | { success: false; data: null; msg: string }
 
-export async function uploadCourse(
+export type PresignedUploadResult =
+  | {
+      success: true
+      data: {
+        cover: { url: string; key: string }
+        video: { url: string; key: string }
+      }
+      msg: null
+    }
+  | { success: false; data: null; msg: string }
+
+export async function createUploadUrls(
+  coverFileName: string,
+  coverType: string,
+  videoFileName: string,
+  videoType: string,
+): Promise<PresignedUploadResult> {
+  if (!coverFileName || !coverType || !videoFileName || !videoType) {
+    return {
+      success: false,
+      data: null,
+      msg: 'Cover and video file details are required',
+    }
+  }
+
+  try {
+    const [coverResult, videoResult] = await Promise.all([
+      createPresignedUploadUrl('courses', coverFileName, coverType),
+      createPresignedUploadUrl('courses', videoFileName, videoType),
+    ])
+
+    if (!coverResult.success || !coverResult.key || !coverResult.url) {
+      return {
+        success: false,
+        data: null,
+        msg: coverResult.msg || 'Failed to create cover upload URL',
+      }
+    }
+
+    if (!videoResult.success || !videoResult.key || !videoResult.url) {
+      return {
+        success: false,
+        data: null,
+        msg: videoResult.msg || 'Failed to create video upload URL',
+      }
+    }
+
+    return {
+      success: true,
+      data: {
+        cover: { url: coverResult.url, key: coverResult.key },
+        video: { url: videoResult.url, key: videoResult.key },
+      },
+      msg: null,
+    }
+  } catch (error: any) {
+    console.error('Error creating upload URLs:', error)
+    return {
+      success: false,
+      data: null,
+      msg: error?.message || 'Failed to create upload URLs',
+    }
+  }
+}
+
+export async function saveCourse(
   title: string,
   price: string,
-  coverImage: File,
-  video: File,
+  coverKey: string,
+  videoKey: string,
   creatorAddress: string,
   chainId: number,
   courseOnchainId: string,
 ): Promise<UploadCourseResult> {
   // Validate required fields
-  if (!title || !price || !coverImage || !video || !creatorAddress) {
+  if (!title || !price || !coverKey || !videoKey || !creatorAddress) {
     return {
       success: false,
       data: null,
@@ -37,63 +102,35 @@ export async function uploadCourse(
   }
 
   return await firstValueFrom(
-    from(
-      Promise.all([
-        uploadFile(coverImage, 'courses'),
-        uploadFile(video, 'courses'),
-      ]),
-    ).pipe(
-      mergeMap(([coverResult, videoResult]) => {
-        // Check if cover image upload failed
-        if (!coverResult.success || !coverResult.key) {
-          return of({
-            success: false,
-            data: null,
-            msg: `Failed to upload cover image: ${coverResult.msg || 'Unknown error'}`,
-          } as UploadCourseResult)
-        }
-
-        // Check if video upload failed
-        if (!videoResult.success || !videoResult.key) {
-          return of({
-            success: false,
-            data: null,
-            msg: `Failed to upload video: ${videoResult.msg || 'Unknown error'}`,
-          } as UploadCourseResult)
-        }
-
-        // Write to database with the provided on-chain course ID
-        return from(getPrisma()).pipe(
-          mergeMap((prisma) => {
-            return from(
-              prisma.courses.create({
-                data: {
-                  course_onchain_id: courseOnchainId,
-                  creator_address: creatorAddress,
-                  chain_id: chainId,
-                  title,
-                  price,
-                  key: videoResult.key,
-                  cover_key: coverResult.key,
-                },
-              }),
-            )
-          }),
-          map((course) => {
-            return {
-              success: true,
-              data: { courseId: course.id },
-              msg: null,
-            } as UploadCourseResult
+    from(getPrisma()).pipe(
+      mergeMap((prisma) => {
+        return from(
+          prisma.courses.create({
+            data: {
+              course_onchain_id: courseOnchainId,
+              creator_address: creatorAddress,
+              chain_id: chainId,
+              title,
+              price,
+              key: videoKey,
+              cover_key: coverKey,
+            },
           }),
         )
       }),
+      map((course) => {
+        return {
+          success: true,
+          data: { courseId: course.id },
+          msg: null,
+        } as UploadCourseResult
+      }),
       catchError((error) => {
-        console.error('Error uploading course:', error)
+        console.error('Error saving course:', error)
         return of({
           success: false,
           data: null,
-          msg: error.message || 'Failed to upload course',
+          msg: error.message || 'Failed to save course',
         } as UploadCourseResult)
       }),
     ),
